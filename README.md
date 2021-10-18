@@ -1,3 +1,3 @@
 # OnboardingKit
 
-A description of this package.
+Easily implement your onboarding flow with a declarative API
