@@ -39,7 +39,7 @@ public enum OnboardingConditions {
 		
 		static func register() {
 			guard !self.registered else {
-				fatalError("Error: Cold-launch onboarding condition must be registered exactly once")
+				return
 			}
 			let coldLaunchCount = UserDefaults.standard.integer(forKey: self.defaultsKey)
 			UserDefaults.standard.set(coldLaunchCount + 1, forKey: self.defaultsKey)
