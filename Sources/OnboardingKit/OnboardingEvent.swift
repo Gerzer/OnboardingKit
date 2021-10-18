@@ -57,7 +57,7 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 	public func register() {
 		self.conditions
 			.compactMap { (condition) in
-				return condition as? RegisterableOnboardingCondition
+				return condition as? RegistrableOnboardingCondition
 			}
 			.forEach { (condition) in
 				type(of: condition).register()

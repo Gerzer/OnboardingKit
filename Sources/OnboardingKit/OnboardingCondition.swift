@@ -15,7 +15,7 @@ public protocol OnboardingCondition {
 	
 }
 
-protocol RegisterableOnboardingCondition: OnboardingCondition {
+protocol RegistrableOnboardingCondition: OnboardingCondition {
 	
 	static func register()
 	
@@ -23,7 +23,7 @@ protocol RegisterableOnboardingCondition: OnboardingCondition {
 
 public enum OnboardingConditions {
 
-	public struct ColdLaunch: RegisterableOnboardingCondition {
+	public struct ColdLaunch: RegistrableOnboardingCondition {
 		
 		public static let trigger = OnboardingTrigger.launch
 		
