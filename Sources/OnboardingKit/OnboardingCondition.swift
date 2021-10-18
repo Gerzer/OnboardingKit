@@ -33,6 +33,10 @@ public enum OnboardingConditions {
 		
 		public let threshold: UInt
 		
+		public init(threshold: UInt) {
+			self.threshold = threshold
+		}
+		
 		static func register() {
 			guard !self.registered else {
 				fatalError("Error: Cold-launch onboarding condition must be registered exactly once")
