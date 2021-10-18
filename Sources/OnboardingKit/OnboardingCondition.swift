@@ -31,7 +31,7 @@ public enum OnboardingConditions {
 		
 		private static var registered = false
 		
-		private let threshold: UInt
+		public let threshold: UInt
 		
 		static func register() {
 			guard !self.registered else {
