@@ -7,6 +7,8 @@
 
 public protocol OnboardingEventProtocol {
 	
+	var triggers: Set<OnboardingTrigger> { get }
+	
 	func register()
 	
 	func check()
@@ -31,16 +33,16 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 	
 	private let conditions: [OnboardingCondition]
 	
-	private var triggers = Set<OnboardingTrigger>()
-	
 	private let flags: Flags
+	
+	public var triggers = Set<OnboardingTrigger>()
 	
 	private init(flags: Flags, value: Value, conditions: [OnboardingCondition]) {
 		self.flags = flags
 		self.value = value
 		self.conditions = conditions
-		self.conditions.forEach { (condition) in
-			self.triggers.insert(type(of: condition).trigger)
+		for condition in conditions {
+			self.triggers.formUnion(type(of: condition).triggers)
 		}
 	}
 	

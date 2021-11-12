@@ -5,6 +5,8 @@
 //  Created by Gabriel Jacoby-Cooper on 10/18/21.
 //
 
+import Foundation
+
 public typealias DefaultOnboardingManager = OnboardingManager<EmptyFlags>
 
 public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
@@ -57,15 +59,30 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 	}
 	
 	private func register() {
-		self.events.forEach { (event) in
+		for event in self.events {
 			event.register()
 		}
 	}
 	
 	private func check() {
-		self.events.forEach { (event) in
+		for event in events {
 			event.check()
 		}
+	}
+	
+	public func incrementManualCounter(withDefaultsKey defaultsKey: String) {
+		let count = UserDefaults.standard.integer(forKey: defaultsKey)
+		UserDefaults.standard.set(count + 1, forKey: defaultsKey)
+	}
+	
+	public func checkManually() {
+		self.events
+			.filter { (event) in
+				return event.triggers.contains(.manual)
+			}
+			.forEach { (event) in
+				event.check()
+			}
 	}
 	
 }

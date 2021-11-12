@@ -7,6 +7,6 @@
 
 public enum OnboardingTrigger {
 	
-	case launch
+	case launch, manual
 	
 }
