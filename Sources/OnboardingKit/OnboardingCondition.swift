@@ -133,6 +133,18 @@ public enum OnboardingConditions {
 			handleContainer[keyPath: keyPath] = Handle(defaultsKey: defaultsKey)
 		}
 		
+		/// Creates a manual-counter condition.
+		/// - Parameters:
+		///   - defaultsKey: The key that’s used to store the value of the counter with `UserDefaults`.
+		///   - threshold: The threshold value that’s given to the comparator.
+		///   - keyPath: A key path to the property in which the condition should store its handle.
+		///   - handleContainer: The container object to a property of which the key path points.
+		///   - comparator: A function that compares the current value of the counter with the specified threshold value.
+		public init<HandleContainer>(defaultsKey: String, threshold: Int, settingHandleAt keyPath: ReferenceWritableKeyPath<HandleContainer, Handle?>, in handleContainer: HandleContainer, comparator: @escaping (Int, Int) -> Bool) {
+			self.init(defaultsKey: defaultsKey, threshold: threshold, comparator: comparator)
+			handleContainer[keyPath: keyPath] = Handle(defaultsKey: defaultsKey)
+		}
+		
 		public func check() -> Bool {
 			let count = UserDefaults.standard.integer(forKey: self.defaultsKey)
 			return self.comparator(count, self.threshold)
