@@ -7,22 +7,33 @@
 
 import Foundation
 
+/// A condition that can be checked to determine whether a particular event occured.
 public protocol OnboardingCondition {
 	
+	/// A set of triggers that indicate when the condition should be checked.
 	static var triggers: Set<OnboardingTrigger> { get }
 	
+	/// Checks whether the condition is currently satisfied.
+	/// - Returns: Whether the condition is currently satisfied.
+	/// - Warning: Don’t call this method yourself.
 	func check() -> Bool
 	
 }
 
+/// A condition that must be registered on every cold launch.
 protocol RegistrableOnboardingCondition: OnboardingCondition {
 	
+	/// Configures the condition prior to being checked for the first time.
+	/// - Warning: Don’t call this method yourself.
 	static func register()
 	
 }
 
+/// A namespace that contains all of the built-in conditions.
 public enum OnboardingConditions {
-
+	
+	/// A condition that checks how many times the app has been cold-launched.
+	/// - Note: A “cold launch” occurs when the app is first opened after having been removed from memory.
 	public struct ColdLaunch: RegistrableOnboardingCondition {
 		
 		public static let triggers: Set<OnboardingTrigger> = [.launch]
@@ -31,8 +42,11 @@ public enum OnboardingConditions {
 		
 		private static var registered = false
 		
+		/// The number of cold launches that should satisfy this condition.
 		public let threshold: Int
 		
+		/// Creates a cold-launch condition.
+		/// - Parameter threshold: The number of cold launches that should satisfy the condition.
 		public init(threshold: Int) {
 			self.threshold = threshold
 		}
@@ -53,8 +67,10 @@ public enum OnboardingConditions {
 		
 	}
 	
+	/// A condition that checks whether a persistent counter satisfies a given comparator.
 	public struct ManualCounter: OnboardingCondition {
 		
+		/// A structure that can be passed around to enable the manipulation of the underlying counter from other parts of a codebase.
 		public struct Handle {
 			
 			private let defaultsKey: String
@@ -63,16 +79,19 @@ public enum OnboardingConditions {
 				self.defaultsKey = defaultsKey
 			}
 			
+			/// Adds 1 to the underlying counter.
 			public func increment() {
 				let count = UserDefaults.standard.integer(forKey: self.defaultsKey)
 				UserDefaults.standard.set(count + 1, forKey: self.defaultsKey)
 			}
 			
+			/// Subtracts 1 from the underlying counter.
 			public func decrement() {
 				let count = UserDefaults.standard.integer(forKey: self.defaultsKey)
 				UserDefaults.standard.set(count - 1, forKey: self.defaultsKey)
 			}
 			
+			/// Resets the counter to 0.
 			public func reset() {
 				UserDefaults.standard.set(0, forKey: self.defaultsKey)
 			}
@@ -81,18 +100,34 @@ public enum OnboardingConditions {
 		
 		public static let triggers: Set<OnboardingTrigger> = [.launch, .manual]
 		
+		/// The key that’s used to store the value of this counter with `UserDefaults`.
 		public let defaultsKey: String
 		
+		/// The threshold value that’s given to the comparator.
 		public let threshold: Int
 		
+		/// A function that compares the current value of the counter with the specified threshold value.
+		/// - Note: The first parameter is the current value, while the second parameter is the threshold value.
 		public let comparator: (Int, Int) -> Bool
 		
+		/// Creates a manual-counter condition.
+		/// - Parameters:
+		///   - defaultsKey: The key that’s used to store the value of the counter with `UserDefaults`.
+		///   - threshold: The threshold value that’s given to the comparator.
+		///   - comparator: A function that compares the current value of the counter with the specified threshold value.
 		public init(defaultsKey: String, threshold: Int, comparator: @escaping (Int, Int) -> Bool) {
 			self.defaultsKey = defaultsKey
 			self.threshold = threshold
 			self.comparator = comparator
 		}
 		
+		/// Creates a manual-counter condition.
+		/// - Parameters:
+		///   - defaultsKey: The key that’s used to store the value of the counter with `UserDefaults`.
+		///   - threshold: The threshold value that’s given to the comparator.
+		///   - keyPath: A key path to the property in which the condition should store its handle.
+		///   - handleContainer: The container object to a property of which the key path points.
+		///   - comparator: A function that compares the current value of the counter with the specified threshold value.
 		public init<HandleContainer>(defaultsKey: String, threshold: Int, settingHandleAt keyPath: ReferenceWritableKeyPath<HandleContainer, Handle>, in handleContainer: HandleContainer, comparator: @escaping (Int, Int) -> Bool) {
 			self.init(defaultsKey: defaultsKey, threshold: threshold, comparator: comparator)
 			handleContainer[keyPath: keyPath] = Handle(defaultsKey: defaultsKey)

@@ -9,6 +9,7 @@ import Foundation
 
 public typealias DefaultOnboardingManager = OnboardingManager<EmptyFlags>
 
+/// A manager class that configures an onboarding flow with a declarative API.
 public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 	
 	@resultBuilder public struct Builder {
