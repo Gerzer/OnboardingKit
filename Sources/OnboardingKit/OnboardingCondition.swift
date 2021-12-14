@@ -153,4 +153,35 @@ public enum OnboardingConditions {
 		
 	}
 	
+	/// A condition that evaluates to “true” if at least one of its child conditions in turn evaluates to “true”.
+	public struct Disjunction: OnboardingCondition {
+		
+		public static var triggers: Set<OnboardingTrigger> = .all
+		
+		private let conditions: [OnboardingCondition]
+		
+		/// Creates a disjunction condition.
+		/// - Parameter conditions: An onboarding-condition result builder.
+		public init(@OnboardingConditionBuilder conditions: () -> [OnboardingCondition]) {
+			self.conditions = conditions()
+		}
+		
+		public func check() -> Bool {
+			return !self.conditions.allSatisfy { (condition) in
+				return !condition.check()
+			}
+		}
+		
+	}
+	
+}
+
+/// A result builder that builds and array of onboarding conditions.
+/// - Warning: Don’t instantiate this structure yourself; instead, use the result-builder syntax.
+@resultBuilder public struct OnboardingConditionBuilder {
+	
+	public static func buildBlock(_ components: OnboardingCondition...) -> [OnboardingCondition] {
+		return components
+	}
+	
 }

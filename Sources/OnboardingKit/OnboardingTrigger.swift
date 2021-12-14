@@ -10,3 +10,13 @@ public enum OnboardingTrigger {
 	case launch, manual
 	
 }
+
+extension Set where Element == OnboardingTrigger {
+	
+	static var all: Self {
+		get {
+			return [.launch, .manual]
+		}
+	}
+	
+}
