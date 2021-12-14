@@ -5,14 +5,14 @@
 //  Created by Gabriel Jacoby-Cooper on 10/18/21.
 //
 
-/// The protocol to which `OnboardingEvent` conforms.
+/// A protocol to which ``OnboardingEvent`` conforms.
 /// - Warning: Don’t add conformance to this protocol to any other types.
 public protocol OnboardingEventProtocol {
 	
 	/// The union of the respective sets of triggers for each constituent condition.
 	var triggers: Set<OnboardingTrigger> { get }
 	
-	/// Registers all of the constituent conditions that conform to `RegistrableOnboardingProtocol`.
+	/// Registers all of the constituent conditions that conform to ``RegistrableOnboardingProtocol``.
 	/// - Warning: Don’t call this method yourself.
 	func register()
 	

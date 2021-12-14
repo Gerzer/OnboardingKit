@@ -33,7 +33,8 @@ protocol RegistrableOnboardingCondition: OnboardingCondition {
 public enum OnboardingConditions {
 	
 	/// A condition that checks how many times the app has been cold-launched.
-	/// - Note: A “cold launch” occurs when the app is first opened after having been removed from memory.
+	///
+	/// A “cold launch” occurs when the app is first opened after having been removed from memory.
 	public struct ColdLaunch: RegistrableOnboardingCondition {
 		
 		public static let triggers: Set<OnboardingTrigger> = [.launch]
