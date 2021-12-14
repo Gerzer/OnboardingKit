@@ -153,7 +153,7 @@ public enum OnboardingConditions {
 		
 	}
 	
-	/// A condition that evaluates to “true” if at least one of its child conditions in turn evaluates to “true”.
+	/// A condition that checks if at least one of its child conditions is satisfied.
 	public struct Disjunction: OnboardingCondition {
 		
 		public static var triggers: Set<OnboardingTrigger> = .all
