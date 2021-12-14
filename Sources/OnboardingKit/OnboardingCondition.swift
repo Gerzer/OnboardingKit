@@ -181,6 +181,25 @@ public enum OnboardingConditions {
 		
 	}
 	
+	/// A condition that checks if a specified date is in the past.
+	@available(iOS 15, macOS 12, watchOS 8, tvOS 15, *) public struct AfterDate: OnboardingCondition {
+		
+		public static var triggers: Set<OnboardingTrigger> = [.launch, .manual]
+		
+		private let date: Date
+		
+		/// Creates an after-date condition.
+		/// - Parameter date: The date after which the condition should be satisfied.
+		public init(_ date: Date) {
+			self.date = date
+		}
+		
+		public func check() -> Bool {
+			return Date.now > self.date
+		}
+		
+	}
+	
 	/// A condition that checks if at least one of its child conditions is satisfied.
 	public struct Disjunction: OnboardingCondition {
 		
