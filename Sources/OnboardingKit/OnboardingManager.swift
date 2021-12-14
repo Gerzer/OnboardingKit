@@ -71,7 +71,7 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 		}
 	}
 	
-	public func incrementManualCounter(withDefaultsKey defaultsKey: String) {
+	public func incrementManualCounter(forDefaultsKey defaultsKey: String) {
 		let count = UserDefaults.standard.integer(forKey: defaultsKey)
 		UserDefaults.standard.set(count + 1, forKey: defaultsKey)
 	}
