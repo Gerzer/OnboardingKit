@@ -153,6 +153,34 @@ public enum OnboardingConditions {
 		
 	}
 	
+	/// A condition that checks how much time has passed since the first launch.
+	@available(iOS 15, macOS 12, watchOS 8, tvOS 15, *) public struct TimeSinceFirstLaunch: RegistrableOnboardingCondition {
+		
+		public static var triggers: Set<OnboardingTrigger> = [.launch]
+		
+		private static let defaultsKey = "FirstLaunch"
+		
+		private let timeInterval: TimeInterval
+		
+		/// Creates a time-since-first-launch condition.
+		/// - Parameter timeInterval: The time in seconds since the first launch after which the condition should be satisfied.
+		public init(_ timeInterval: TimeInterval) {
+			self.timeInterval = timeInterval
+		}
+		
+		static func register() {
+			UserDefaults.standard.set(Date.now, forKey: Self.defaultsKey)
+		}
+		
+		public func check() -> Bool {
+			guard let firstLaunchDate = UserDefaults.standard.object(forKey: Self.defaultsKey) as? Date else {
+				return false
+			}
+			return firstLaunchDate.timeIntervalSinceNow < -self.timeInterval
+		}
+		
+	}
+	
 	/// A condition that checks if at least one of its child conditions is satisfied.
 	public struct Disjunction: OnboardingCondition {
 		
