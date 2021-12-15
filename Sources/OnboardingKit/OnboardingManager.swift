@@ -99,9 +99,3 @@ public extension OnboardingManager where Flags: InitializableOnboardingFlags {
 	}
 	
 }
-
-public final class EmptyFlags: InitializableOnboardingFlags {
-	
-	public init() { }
-	
-}

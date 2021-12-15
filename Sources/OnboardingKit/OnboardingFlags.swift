@@ -16,3 +16,9 @@ public protocol InitializableOnboardingFlags: OnboardingFlags {
 	init()
 	
 }
+
+public final class EmptyFlags: InitializableOnboardingFlags {
+	
+	public init() { }
+	
+}
