@@ -156,7 +156,7 @@ public enum OnboardingConditions {
 	/// A condition that checks how much time has passed since the first launch.
 	@available(iOS 15, macOS 12, watchOS 8, tvOS 15, *) public struct TimeSinceFirstLaunch: RegistrableOnboardingCondition {
 		
-		public static var triggers: Set<OnboardingTrigger> = [.launch]
+		public static var triggers: Set<OnboardingTrigger> = [.launch, .manual]
 		
 		private static let defaultsKey = "FirstLaunch"
 		
