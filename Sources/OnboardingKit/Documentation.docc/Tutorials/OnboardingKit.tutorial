@@ -1,0 +1,9 @@
+@Tutorials(name: "Getting Started with OnboardingKit") {
+	@Intro(title: "Meet OnboardingKit") {
+		Easily specify your app’s onboarding logic with a declarative API. Get started with OnboardingKit by building the demo app *[demo app name]*.
+	}
+	@Chapter(name: "OnboardingKit Essentials") {
+		Configure the onboarding manager and specify basic onboarding logic.
+		@TutorialReference
+	}
+}

@@ -1,0 +1,17 @@
+@Tutorial(time: 10) {
+	@Intro(title: "OnboardingKit Essentials") {
+		This tutorial guides you through building *Procrastinator*, an app for helping people procrastinate. You’ll start by configuring the onboarding manager.
+	}
+	@Section(title: "Create a new project and add OnboardingKit") {
+		@Steps {
+			@Step {
+				Create a new project using the iOS App template.
+				@Image(source: "Xcode Template.png", alt: "")
+			}
+			@Step {
+				Enter ”Procrastinator” as the Product Name and select “SwiftUI” from the Interface pop-up.
+				@Image(source: "Xcode Project Options.png", alt: "")
+			}
+		}
+	}
+}
