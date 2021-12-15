@@ -52,7 +52,7 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 	///   - value: A value that that’s passed into the handler for context.
 	///   - handler: A function that takes in a context value and sets some property on flags object.
 	///   - conditions: A builder that configures the constituent conditions.
-	public convenience init(flags: Flags, value: Value, _ handler: @escaping ((Value) -> Void), @OnboardingConditionBuilder conditions: () -> [OnboardingCondition]) {
+	public convenience init(flags: Flags, value: Value, _ handler: @escaping ((Value) -> Void), @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
 		self.init(flags: flags, value: value, conditions: conditions())
 		self.handler = handler
 	}
@@ -63,7 +63,7 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 	///   - keyPath: A key path to the property that the event should set.
 	///   - value: The value to which the event should set the property that’s specified by the key path.
 	///   - conditions: A builder that configures the constituent conditions.
-	public convenience init(flags: Flags, settingFlagAt keyPath: ReferenceWritableKeyPath<Flags, Value>, to value: Value, @OnboardingConditionBuilder conditions: () -> [OnboardingCondition]) {
+	public convenience init(flags: Flags, settingFlagAt keyPath: ReferenceWritableKeyPath<Flags, Value>, to value: Value, @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
 		self.init(flags: flags, value: value, conditions: conditions())
 		self.keyPath = keyPath
 	}
@@ -102,7 +102,7 @@ public extension OnboardingEvent where Value == Bool {
 	///   - flags: An object a property of which you set in the handler when the event occurs.
 	///   - handler: A function that takes in a context value and sets some property on the flags object.
 	///   - conditions: A builder that configures the constituent conditions.
-	convenience init(flags: Flags, _ handler: @escaping ((Bool) -> Void), @OnboardingConditionBuilder conditions: () -> [OnboardingCondition]) {
+	convenience init(flags: Flags, _ handler: @escaping ((Bool) -> Void), @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
 		self.init(flags: flags, value: true, handler, conditions: conditions)
 	}
 	
@@ -111,7 +111,7 @@ public extension OnboardingEvent where Value == Bool {
 	///   - flags: An object a property of which the event sets when all of its conditions are satisfied.
 	///   - keyPath: A key path to the property that the event should set.
 	///   - conditions: A builder that configures the constituent conditions.
-	convenience init(flags: Flags, settingFlagAt keyPath: ReferenceWritableKeyPath<Flags, Bool>, @OnboardingConditionBuilder conditions: () -> [OnboardingCondition]) {
+	convenience init(flags: Flags, settingFlagAt keyPath: ReferenceWritableKeyPath<Flags, Bool>, @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
 		self.init(flags: flags, settingFlagAt: keyPath, to: true, conditions: conditions)
 	}
 	

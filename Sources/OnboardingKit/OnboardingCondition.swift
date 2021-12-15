@@ -217,7 +217,7 @@ public enum OnboardingConditions {
 		
 		/// Creates a disjunction condition.
 		/// - Parameter conditions: An onboarding-condition result builder.
-		public init(@OnboardingConditionBuilder conditions: () -> [OnboardingCondition]) {
+		public init(@OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
 			self.conditions = conditions()
 		}
 		
@@ -241,9 +241,9 @@ public enum OnboardingConditions {
 	
 }
 
-/// A result builder that builds and array of onboarding conditions.
+/// A result builder that builds an array of onboarding conditions.
 /// - Warning: Don’t instantiate this structure yourself; instead, use the result-builder syntax.
-@resultBuilder public struct OnboardingConditionBuilder {
+@resultBuilder public struct OnboardingConditionsBuilder {
 	
 	public static func buildBlock(_ components: OnboardingCondition...) -> [OnboardingCondition] {
 		return components
