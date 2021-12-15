@@ -80,19 +80,19 @@ public enum OnboardingConditions {
 				self.defaultsKey = defaultsKey
 			}
 			
-			/// Adds 1 to the underlying counter.
+			/// Adds `1` to the underlying counter.
 			public func increment() {
 				let count = UserDefaults.standard.integer(forKey: self.defaultsKey)
 				UserDefaults.standard.set(count + 1, forKey: self.defaultsKey)
 			}
 			
-			/// Subtracts 1 from the underlying counter.
+			/// Subtracts `1` from the underlying counter.
 			public func decrement() {
 				let count = UserDefaults.standard.integer(forKey: self.defaultsKey)
 				UserDefaults.standard.set(count - 1, forKey: self.defaultsKey)
 			}
 			
-			/// Resets the counter to 0.
+			/// Resets the counter to `0`.
 			public func reset() {
 				UserDefaults.standard.set(0, forKey: self.defaultsKey)
 			}
