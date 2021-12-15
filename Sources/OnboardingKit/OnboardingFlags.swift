@@ -17,6 +17,7 @@ public protocol InitializableOnboardingFlags: OnboardingFlags {
 	
 }
 
+/// A special concrete flags type that doesn’t actually contain any flags.
 public final class EmptyFlags: InitializableOnboardingFlags {
 	
 	public init() { }
