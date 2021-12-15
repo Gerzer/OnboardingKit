@@ -25,7 +25,7 @@ protocol RegistrableOnboardingCondition: OnboardingCondition {
 	
 	/// Configures the condition prior to being checked for the first time.
 	/// - Warning: Don’t call this method yourself.
-	static func register()
+	func register()
 	
 }
 
@@ -52,13 +52,13 @@ public enum OnboardingConditions {
 			self.threshold = threshold
 		}
 		
-		static func register() {
-			guard !self.registered else {
+		func register() {
+			guard !Self.registered else {
 				return
 			}
-			let coldLaunchCount = UserDefaults.standard.integer(forKey: self.defaultsKey)
-			UserDefaults.standard.set(coldLaunchCount + 1, forKey: self.defaultsKey)
-			self.registered = true
+			let coldLaunchCount = UserDefaults.standard.integer(forKey: Self.defaultsKey)
+			UserDefaults.standard.set(coldLaunchCount + 1, forKey: Self.defaultsKey)
+			Self.registered = true
 		}
 		
 		public func check() -> Bool {
@@ -160,6 +160,8 @@ public enum OnboardingConditions {
 		
 		private static let defaultsKey = "FirstLaunch"
 		
+		private static var registered = false
+		
 		private let timeInterval: TimeInterval
 		
 		/// Creates a time-since-first-launch condition.
@@ -168,8 +170,12 @@ public enum OnboardingConditions {
 			self.timeInterval = timeInterval
 		}
 		
-		static func register() {
+		func register() {
+			guard !Self.registered else {
+				return
+			}
 			UserDefaults.standard.set(Date.now, forKey: Self.defaultsKey)
+			Self.registered = true
 		}
 		
 		public func check() -> Bool {
@@ -201,7 +207,7 @@ public enum OnboardingConditions {
 	}
 	
 	/// A condition that checks if at least one of its child conditions is satisfied.
-	public struct Disjunction: OnboardingCondition {
+	public struct Disjunction: RegistrableOnboardingCondition {
 		
 		public static var triggers: Set<OnboardingTrigger> = .all
 		
@@ -211,6 +217,16 @@ public enum OnboardingConditions {
 		/// - Parameter conditions: An onboarding-condition result builder.
 		public init(@OnboardingConditionBuilder conditions: () -> [OnboardingCondition]) {
 			self.conditions = conditions()
+		}
+		
+		func register() {
+			self.conditions
+				.compactMap { (condition) in
+					return condition as? RegistrableOnboardingCondition
+				}
+				.forEach { (condition) in
+					condition.register()
+				}
 		}
 		
 		public func check() -> Bool {

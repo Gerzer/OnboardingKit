@@ -12,7 +12,7 @@ public protocol OnboardingEventProtocol {
 	/// The union of the respective sets of triggers for each constituent condition.
 	var triggers: Set<OnboardingTrigger> { get }
 	
-	/// Registers all of the constituent conditions that conform to ``RegistrableOnboardingProtocol``.
+	/// Registers all of the constituent conditions that support registration.
 	/// - Warning: Don’t call this method yourself.
 	func register()
 	
@@ -74,7 +74,7 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 				return condition as? RegistrableOnboardingCondition
 			}
 			.forEach { (condition) in
-				type(of: condition).register()
+				condition.register()
 			}
 		if self.triggers.contains(.launch) {
 			self.check()
