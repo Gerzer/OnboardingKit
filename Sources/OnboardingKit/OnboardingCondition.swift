@@ -174,7 +174,9 @@ public enum OnboardingConditions {
 			guard !Self.registered else {
 				return
 			}
-			UserDefaults.standard.set(Date.now, forKey: Self.defaultsKey)
+			if UserDefaults.standard.object(forKey: Self.defaultsKey) == nil {
+				UserDefaults.standard.set(Date.now, forKey: Self.defaultsKey)
+			}
 			Self.registered = true
 		}
 		
