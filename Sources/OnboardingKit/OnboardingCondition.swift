@@ -46,10 +46,18 @@ public enum OnboardingConditions {
 		/// The number of cold launches that should satisfy this condition.
 		public let threshold: Int
 		
+		/// A function that compares the current value with the specified threshold value.
+		///
+		/// The first parameter is the current value, while the second parameter is the threshold value.
+		public let comparator: (Int, Int) -> Bool
+		
 		/// Creates a cold-launch condition.
-		/// - Parameter threshold: The number of cold launches that should satisfy the condition.
-		public init(threshold: Int) {
+		/// - Parameters:
+		///   - threshold: The threshold value that’s given to the comparator.
+		///   - comparator: A function that compares the current value with the specified threshold value.
+		public init(threshold: Int, comparator: @escaping (Int, Int) -> Bool = (==)) {
 			self.threshold = threshold
+			self.comparator = comparator
 		}
 		
 		func register() {
@@ -63,7 +71,7 @@ public enum OnboardingConditions {
 		
 		public func check() -> Bool {
 			let coldLaunchCount = UserDefaults.standard.integer(forKey: Self.defaultsKey)
-			return coldLaunchCount == self.threshold
+			return self.comparator(coldLaunchCount, self.threshold)
 		}
 		
 	}
@@ -107,16 +115,17 @@ public enum OnboardingConditions {
 		/// The threshold value that’s given to the comparator.
 		public let threshold: Int
 		
-		/// A function that compares the current value of the counter with the specified threshold value.
-		/// - Note: The first parameter is the current value, while the second parameter is the threshold value.
+		/// A function that compares the current value with the specified threshold value.
+		///
+		/// The first parameter is the current value, while the second parameter is the threshold value.
 		public let comparator: (Int, Int) -> Bool
 		
 		/// Creates a manual-counter condition.
 		/// - Parameters:
 		///   - defaultsKey: The key that’s used to store the value of the counter with `UserDefaults`.
 		///   - threshold: The threshold value that’s given to the comparator.
-		///   - comparator: A function that compares the current value of the counter with the specified threshold value.
-		public init(defaultsKey: String, threshold: Int, comparator: @escaping (Int, Int) -> Bool) {
+		///   - comparator: A function that compares the current value with the specified threshold value.
+		public init(defaultsKey: String, threshold: Int, comparator: @escaping (Int, Int) -> Bool = (==)) {
 			self.defaultsKey = defaultsKey
 			self.threshold = threshold
 			self.comparator = comparator
@@ -129,7 +138,7 @@ public enum OnboardingConditions {
 		///   - keyPath: A key path to the property in which the condition should store its handle.
 		///   - handleContainer: The container object to a property of which the key path points.
 		///   - comparator: A function that compares the current value of the counter with the specified threshold value.
-		public init<HandleContainer>(defaultsKey: String, threshold: Int, settingHandleAt keyPath: ReferenceWritableKeyPath<HandleContainer, Handle>, in handleContainer: HandleContainer, comparator: @escaping (Int, Int) -> Bool) {
+		public init<HandleContainer>(defaultsKey: String, threshold: Int, settingHandleAt keyPath: ReferenceWritableKeyPath<HandleContainer, Handle>, in handleContainer: HandleContainer, comparator: @escaping (Int, Int) -> Bool = (==)) {
 			self.init(defaultsKey: defaultsKey, threshold: threshold, comparator: comparator)
 			handleContainer[keyPath: keyPath] = Handle(defaultsKey: defaultsKey)
 		}
@@ -141,7 +150,7 @@ public enum OnboardingConditions {
 		///   - keyPath: A key path to the property in which the condition should store its handle.
 		///   - handleContainer: The container object to a property of which the key path points.
 		///   - comparator: A function that compares the current value of the counter with the specified threshold value.
-		public init<HandleContainer>(defaultsKey: String, threshold: Int, settingHandleAt keyPath: ReferenceWritableKeyPath<HandleContainer, Handle?>, in handleContainer: HandleContainer, comparator: @escaping (Int, Int) -> Bool) {
+		public init<HandleContainer>(defaultsKey: String, threshold: Int, settingHandleAt keyPath: ReferenceWritableKeyPath<HandleContainer, Handle?>, in handleContainer: HandleContainer, comparator: @escaping (Int, Int) -> Bool = (==)) {
 			self.init(defaultsKey: defaultsKey, threshold: threshold, comparator: comparator)
 			handleContainer[keyPath: keyPath] = Handle(defaultsKey: defaultsKey)
 		}
@@ -162,12 +171,21 @@ public enum OnboardingConditions {
 		
 		private static var registered = false
 		
-		private let timeInterval: TimeInterval
+		/// The threshold value that’s given to the comparator.
+		public let threshold: TimeInterval
+		
+		/// A function that compares the current value with the specified threshold value.
+		///
+		/// The first parameter is the current value, while the second parameter is the threshold value.
+		public let comparator: (TimeInterval, TimeInterval) -> Bool
 		
 		/// Creates a time-since-first-launch condition.
-		/// - Parameter timeInterval: The time in seconds since the first launch after which the condition should be satisfied.
-		public init(_ timeInterval: TimeInterval) {
-			self.timeInterval = timeInterval
+		/// - Parameters:
+		///   - threshold: The threshold value that’s given to the comparator.
+		///   - comparator: A function that compares the current value with the specified threshold value.
+		public init(threshold: TimeInterval, comparator: @escaping (TimeInterval, TimeInterval) -> Bool = (>)) {
+			self.threshold = threshold
+			self.comparator = comparator
 		}
 		
 		func register() {
@@ -184,7 +202,7 @@ public enum OnboardingConditions {
 			guard let firstLaunchDate = UserDefaults.standard.object(forKey: Self.defaultsKey) as? Date else {
 				return false
 			}
-			return firstLaunchDate.timeIntervalSinceNow < -self.timeInterval
+			return self.comparator(-firstLaunchDate.timeIntervalSinceNow, self.threshold)
 		}
 		
 	}
