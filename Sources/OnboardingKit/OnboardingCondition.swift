@@ -226,6 +226,39 @@ public enum OnboardingConditions {
 		
 	}
 	
+	/// A condition that checks if all of its child conditions are satisfied.
+	///
+	/// All top-level conditions are conjuncted by default without the need for this special condition. This condition is most useful when it’s nested inside a ``Disjunction`` condition.
+	public struct Conjunction: RegistrableOnboardingCondition {
+		
+		public static var triggers: Set<OnboardingTrigger> = .all
+		
+		private let conditions: [OnboardingCondition]
+		
+		/// Creates a conjunction condition.
+		/// - Parameter conditions: An onboarding-condition result builder.
+		public init(@OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
+			self.conditions = conditions()
+		}
+		
+		func register() {
+			self.conditions
+				.compactMap { (condition) in
+					return condition as? RegistrableOnboardingCondition
+				}
+				.forEach { (condition) in
+					condition.register()
+				}
+		}
+		
+		public func check() -> Bool {
+			return self.conditions.allSatisfy { (condition) in
+				return condition.check()
+			}
+		}
+		
+	}
+	
 	/// A condition that checks if at least one of its child conditions is satisfied.
 	public struct Disjunction: RegistrableOnboardingCondition {
 		
