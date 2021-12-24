@@ -20,19 +20,6 @@ public protocol OnboardingEventProtocol {
 	/// - Warning: Don’t call this method yourself.
 	func check()
 	
-	/// Attempts to set the specified flag to a default value.
-	///
-	/// This method should fail silently if no default value can be inferred.
-	/// - Parameter keyPath: The key path at which to set the default value.
-	/// - Warning: Don’t call this method yourself.
-	func setDefaultValue<Flags, Value>(at keyPath: ReferenceWritableKeyPath<Flags, Value>)
-	
-}
-
-extension OnboardingEventProtocol {
-	
-	public func setDefaultValue<Flags, Value>(at: ReferenceWritableKeyPath<Flags, Value>) { }
-	
 }
 
 /// An event that occurs when all of its constituent conditions are satisfied.
@@ -103,8 +90,10 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 			if let keyPath = self.keyPath {
 				self.flags[keyPath: keyPath] = self.value
 			}
-		} else if let keyPath = self.keyPath {
-			self.setDefaultValue(at: keyPath)
+		} else if let keyPath = self.keyPath as? ReferenceWritableKeyPath<Flags, Bool> {
+			self.flags[keyPath: keyPath] = false
+		} else if let keyPath = self.keyPath, let defaultValue = (Value.self as? OptionalProtocol.Type)?.none as? Value {
+			self.flags[keyPath: keyPath] = defaultValue
 		}
 	}
 	
@@ -128,18 +117,6 @@ public extension OnboardingEvent where Value == Bool {
 	///   - conditions: A builder that configures the constituent conditions.
 	convenience init(flags: Flags, settingFlagAt keyPath: ReferenceWritableKeyPath<Flags, Bool>, @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
 		self.init(flags: flags, settingFlagAt: keyPath, to: true, conditions: conditions)
-	}
-	
-	func setDefaultValue(at keyPath: ReferenceWritableKeyPath<Flags, Bool>) {
-		self.flags[keyPath: keyPath] = false
-	}
-	
-}
-
-public extension OnboardingEvent where Value: ExpressibleByNilLiteral {
-	
-	func setDefaultValue(at keyPath: ReferenceWritableKeyPath<Flags, Value>) {
-		self.flags[keyPath: keyPath] = nil
 	}
 	
 }
