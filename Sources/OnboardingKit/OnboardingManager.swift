@@ -17,8 +17,32 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 	/// - Warning: Don’t instantiate this structure yourself; instead, use the result-builder syntax.
 	@resultBuilder public struct Builder {
 		
-		public static func buildBlock(_ components: OnboardingEventProtocol...) -> [OnboardingEventProtocol] {
-			return components
+		public static func buildBlock(_ components: [OnboardingEventProtocol]...) -> [OnboardingEventProtocol] {
+			return Array(components.joined())
+		}
+		
+		public static func buildExpression(_ expression: OnboardingEventProtocol) -> [OnboardingEventProtocol] {
+			return [expression]
+		}
+		
+		public static func buildOptional(_ component: [OnboardingEventProtocol]?) -> [OnboardingEventProtocol] {
+			return component ?? []
+		}
+		
+		public static func buildEither(first component: [OnboardingEventProtocol]) -> [OnboardingEventProtocol] {
+			return component
+		}
+		
+		public static func buildEither(second component: [OnboardingEventProtocol]) -> [OnboardingEventProtocol] {
+			return component
+		}
+		
+		public static func buildArray(_ components: [[OnboardingEventProtocol]]) -> [OnboardingEventProtocol] {
+			return Array(components.joined())
+		}
+		
+		public static func buildLimitedAvailability(_ component: [OnboardingEventProtocol]) -> [OnboardingEventProtocol] {
+			return component
 		}
 		
 	}

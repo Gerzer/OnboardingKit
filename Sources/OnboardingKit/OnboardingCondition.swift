@@ -296,8 +296,32 @@ public enum OnboardingConditions {
 /// - Warning: Don’t instantiate this structure yourself; instead, use the result-builder syntax.
 @resultBuilder public struct OnboardingConditionsBuilder {
 	
-	public static func buildBlock(_ components: OnboardingCondition...) -> [OnboardingCondition] {
-		return components
+	public static func buildExpression(_ expression: OnboardingCondition) -> [OnboardingCondition] {
+		return [expression]
+	}
+	
+	public static func buildBlock(_ components: [OnboardingCondition]...) -> [OnboardingCondition] {
+		return Array(components.joined())
+	}
+	
+	public static func buildOptional(_ component: [OnboardingCondition]?) -> [OnboardingCondition] {
+		return component ?? []
+	}
+	
+	public static func buildEither(first component: [OnboardingCondition]) -> [OnboardingCondition] {
+		return component
+	}
+	
+	public static func buildEither(second component: [OnboardingCondition]) -> [OnboardingCondition] {
+		return component
+	}
+	
+	public static func buildArray(_ components: [[OnboardingCondition]]) -> [OnboardingCondition] {
+		return Array(components.joined())
+	}
+	
+	public static func buildLimitedAvailability(_ component: [OnboardingCondition]) -> [OnboardingCondition] {
+		return component
 	}
 	
 }
