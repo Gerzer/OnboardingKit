@@ -93,7 +93,7 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 	
 	private func add(_ event: OnboardingEventProtocol) {
 		guard !self.hasBeenConfigured else {
-			fatalError("Error: Can't add an onboarding event to an onboarding manager that has already been configured")
+			fatalError("Error: Can’t add an onboarding event to an onboarding manager that has already been configured")
 		}
 		self.events.append(event)
 	}
