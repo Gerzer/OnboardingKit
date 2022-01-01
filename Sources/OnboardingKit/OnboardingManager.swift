@@ -84,7 +84,7 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 	/// Creates an onboarding manager.
 	/// - Parameters:
 	///   - flags: A flags object the properties of which events in the onboarding manager can set when they’re triggered.
-	///   - configurator: A closure that configures the onboarding manager via a ``Proxy`` instance.
+	///   - configurator: A closure that configures the onboarding manager via an instance of ``Proxy``.
 	public init(flags: Flags, configurator: (Proxy, Flags) -> Void) {
 		self.flags = flags
 		configurator(Proxy(manager: self), self.flags)
