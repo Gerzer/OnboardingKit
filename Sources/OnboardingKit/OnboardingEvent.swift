@@ -52,7 +52,7 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 	///   - value: A value that that’s passed into the handler for context.
 	///   - handler: A function that takes in a context value and sets some property on flags object.
 	///   - conditions: A builder that configures the constituent conditions.
-	public convenience init(flags: Flags, value: Value, _ handler: @escaping ((Value) -> Void), @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
+	public convenience init(flags: Flags, value: Value, handler: @escaping ((Value) -> Void), @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
 		self.init(flags: flags, value: value, conditions: conditions())
 		self.handler = handler
 	}
@@ -83,7 +83,7 @@ public final class OnboardingEvent<Flags, Value>: OnboardingEventProtocol where 
 	
 	public func check() {
 		let doExecute = self.conditions.allSatisfy { (condition) in
-			return condition.check()
+			return condition.isSatisfied
 		}
 		if doExecute {
 			self.handler?(self.value)
@@ -106,8 +106,8 @@ public extension OnboardingEvent where Value == Bool {
 	///   - flags: An object a property of which you set in the handler when the event occurs.
 	///   - handler: A function that takes in a context value and sets some property on the flags object.
 	///   - conditions: A builder that configures the constituent conditions.
-	convenience init(flags: Flags, _ handler: @escaping ((Bool) -> Void), @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
-		self.init(flags: flags, value: true, handler, conditions: conditions)
+	convenience init(flags: Flags, handler: @escaping ((Bool) -> Void), @OnboardingConditionsBuilder conditions: () -> [OnboardingCondition]) {
+		self.init(flags: flags, value: true, handler: handler, conditions: conditions)
 	}
 	
 	/// Creates an event with a default value of `true`.

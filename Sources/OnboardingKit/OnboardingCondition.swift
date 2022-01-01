@@ -13,10 +13,9 @@ public protocol OnboardingCondition {
 	/// A set of triggers that indicate when the condition should be checked.
 	static var triggers: Set<OnboardingTrigger> { get }
 	
-	/// Checks whether the condition is currently satisfied.
-	/// - Returns: Whether the condition is currently satisfied.
-	/// - Warning: Don’t call this method yourself.
-	func check() -> Bool
+	/// Whether the condition is currently satisfied.
+	/// - Complexity: This property might take greater than `O(1)` time to compute for some condition types. For example, ``OnboardingConditions/Disjunction`` takes `O(n)` time when it contains only one level of nesting, where `n` is the number of child conditions.
+	var isSatisfied: Bool { get }
 	
 }
 
@@ -43,12 +42,18 @@ public enum OnboardingConditions {
 		
 		private static var registered = false
 		
+		public var isSatisfied: Bool {
+			get {
+				let coldLaunchCount = UserDefaults.standard.integer(forKey: Self.defaultsKey)
+				return self.comparator(coldLaunchCount, self.threshold)
+			}
+		}
+		
 		/// The number of cold launches that should satisfy this condition.
 		public let threshold: Int
 		
 		/// A function that compares the current value with the specified threshold value.
-		///
-		/// The first parameter is the current value, while the second parameter is the threshold value.
+		/// - Remark: The first parameter is the current value, while the second parameter is the threshold value.
 		public let comparator: (Int, Int) -> Bool
 		
 		/// Creates a cold-launch condition.
@@ -67,11 +72,6 @@ public enum OnboardingConditions {
 			let coldLaunchCount = UserDefaults.standard.integer(forKey: Self.defaultsKey)
 			UserDefaults.standard.set(coldLaunchCount + 1, forKey: Self.defaultsKey)
 			Self.registered = true
-		}
-		
-		public func check() -> Bool {
-			let coldLaunchCount = UserDefaults.standard.integer(forKey: Self.defaultsKey)
-			return self.comparator(coldLaunchCount, self.threshold)
 		}
 		
 	}
@@ -109,6 +109,13 @@ public enum OnboardingConditions {
 		
 		public static let triggers: Set<OnboardingTrigger> = [.launch, .manual]
 		
+		public var isSatisfied: Bool {
+			get {
+				let count = UserDefaults.standard.integer(forKey: self.defaultsKey)
+				return self.comparator(count, self.threshold)
+			}
+		}
+		
 		/// The key that’s used to store the value of this counter with `UserDefaults`.
 		public let defaultsKey: String
 		
@@ -116,8 +123,7 @@ public enum OnboardingConditions {
 		public let threshold: Int
 		
 		/// A function that compares the current value with the specified threshold value.
-		///
-		/// The first parameter is the current value, while the second parameter is the threshold value.
+		/// - Remark: The first parameter is the current value, while the second parameter is the threshold value.
 		public let comparator: (Int, Int) -> Bool
 		
 		/// Creates a manual-counter condition.
@@ -155,11 +161,6 @@ public enum OnboardingConditions {
 			handleContainer[keyPath: keyPath] = Handle(defaultsKey: defaultsKey)
 		}
 		
-		public func check() -> Bool {
-			let count = UserDefaults.standard.integer(forKey: self.defaultsKey)
-			return self.comparator(count, self.threshold)
-		}
-		
 	}
 	
 	/// A condition that checks how much time has passed since the first launch.
@@ -171,12 +172,20 @@ public enum OnboardingConditions {
 		
 		private static var registered = false
 		
+		public var isSatisfied: Bool {
+			get {
+				guard let firstLaunchDate = UserDefaults.standard.object(forKey: Self.defaultsKey) as? Date else {
+					return false
+				}
+				return self.comparator(-firstLaunchDate.timeIntervalSinceNow, self.threshold)
+			}
+		}
+		
 		/// The threshold value that’s given to the comparator.
 		public let threshold: TimeInterval
 		
 		/// A function that compares the current value with the specified threshold value.
-		///
-		/// The first parameter is the current value, while the second parameter is the threshold value.
+		/// - Remark: The first parameter is the current value, while the second parameter is the threshold value.
 		public let comparator: (TimeInterval, TimeInterval) -> Bool
 		
 		/// Creates a time-since-first-launch condition.
@@ -198,13 +207,6 @@ public enum OnboardingConditions {
 			Self.registered = true
 		}
 		
-		public func check() -> Bool {
-			guard let firstLaunchDate = UserDefaults.standard.object(forKey: Self.defaultsKey) as? Date else {
-				return false
-			}
-			return self.comparator(-firstLaunchDate.timeIntervalSinceNow, self.threshold)
-		}
-		
 	}
 	
 	/// A condition that checks if a specified date is in the past.
@@ -212,16 +214,18 @@ public enum OnboardingConditions {
 		
 		public static var triggers: Set<OnboardingTrigger> = [.launch, .manual]
 		
+		public var isSatisfied: Bool {
+			get {
+				return Date.now > self.date
+			}
+		}
+		
 		private let date: Date
 		
 		/// Creates an after-date condition.
 		/// - Parameter date: The date after which the condition should be satisfied.
-		public init(_ date: Date) {
+		public init(date: Date) {
 			self.date = date
-		}
-		
-		public func check() -> Bool {
-			return Date.now > self.date
 		}
 		
 	}
@@ -232,6 +236,14 @@ public enum OnboardingConditions {
 	public struct Conjunction: RegistrableOnboardingCondition {
 		
 		public static var triggers: Set<OnboardingTrigger> = .all
+		
+		public var isSatisfied: Bool {
+			get {
+				return self.conditions.allSatisfy { (condition) in
+					return condition.isSatisfied
+				}
+			}
+		}
 		
 		private let conditions: [OnboardingCondition]
 		
@@ -251,18 +263,20 @@ public enum OnboardingConditions {
 				}
 		}
 		
-		public func check() -> Bool {
-			return self.conditions.allSatisfy { (condition) in
-				return condition.check()
-			}
-		}
-		
 	}
 	
 	/// A condition that checks if at least one of its child conditions is satisfied.
 	public struct Disjunction: RegistrableOnboardingCondition {
 		
 		public static var triggers: Set<OnboardingTrigger> = .all
+		
+		public var isSatisfied: Bool {
+			get {
+				return !self.conditions.allSatisfy { (condition) in
+					return !condition.isSatisfied
+				}
+			}
+		}
 		
 		private let conditions: [OnboardingCondition]
 		
@@ -280,12 +294,6 @@ public enum OnboardingConditions {
 				.forEach { (condition) in
 					condition.register()
 				}
-		}
-		
-		public func check() -> Bool {
-			return !self.conditions.allSatisfy { (condition) in
-				return !condition.check()
-			}
 		}
 		
 	}

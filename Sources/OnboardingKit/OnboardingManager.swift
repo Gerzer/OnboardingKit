@@ -52,7 +52,7 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 		
 		private let manager: OnboardingManager
 		
-		fileprivate init(_ manager: OnboardingManager) {
+		fileprivate init(manager: OnboardingManager) {
 			self.manager = manager
 		}
 		
@@ -66,7 +66,7 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 	
 	private var events = [OnboardingEventProtocol]()
 	
-	private var configured = false
+	private var hasBeenConfigured = false
 	
 	/// The flags object that this onboarding manager provides to its constituent events.
 	public let flags: Flags
@@ -85,14 +85,14 @@ public final class OnboardingManager<Flags> where Flags: OnboardingFlags {
 	/// - Parameters:
 	///   - flags: A flags object the properties of which events in the onboarding manager can set when they’re triggered.
 	///   - configurator: A closure that configures the onboarding manager via a ``Proxy`` instance.
-	public init(flags: Flags, _ configurator: (Proxy, Flags) -> Void) {
+	public init(flags: Flags, configurator: (Proxy, Flags) -> Void) {
 		self.flags = flags
-		configurator(Proxy(self), self.flags)
+		configurator(Proxy(manager: self), self.flags)
 		self.register()
 	}
 	
 	private func add(_ event: OnboardingEventProtocol) {
-		guard !self.configured else {
+		guard !self.hasBeenConfigured else {
 			fatalError("Error: Can't add an onboarding event to an onboarding manager that has already been configured")
 		}
 		self.events.append(event)
@@ -140,8 +140,8 @@ public extension OnboardingManager where Flags: InitializableOnboardingFlags {
 	
 	/// Creates an onboarding manager.
 	/// - Parameter configurator: A closure that configures the onboarding manager via a ``Proxy`` instance.
-	convenience init(_ configurator: (Proxy, Flags) -> Void) {
-		self.init(flags: Flags(), configurator)
+	convenience init(configurator: (Proxy, Flags) -> Void) {
+		self.init(flags: Flags(), configurator: configurator)
 	}
 	
 }
