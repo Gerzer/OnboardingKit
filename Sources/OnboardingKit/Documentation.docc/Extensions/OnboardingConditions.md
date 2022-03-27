@@ -6,6 +6,8 @@
 
 - ``ColdLaunch``
 - ``ManualCounter``
+- ``Once``
 - ``TimeSinceFirstLaunch``
 - ``AfterDate``
+- ``Conjunction``
 - ``Disjunction``

@@ -163,6 +163,33 @@ public enum OnboardingConditions {
 		
 	}
 	
+	/// A condition that’s satisfied on the first cold launch and never again.
+	public struct Once: OnboardingCondition {
+		
+		public static var triggers: Set<OnboardingTrigger> = [.launch]
+		
+		public var isSatisfied: Bool {
+			get {
+				if UserDefaults.standard.bool(forKey: self.defaultsKey) {
+					return false
+				} else {
+					UserDefaults.standard.set(true, forKey: self.defaultsKey)
+					return true
+				}
+			}
+		}
+		
+		/// The key that’s used to store the Boolean flag for this condition with `UserDefaults`.
+		public let defaultsKey: String
+		
+		/// Creates a “once” condition.
+		/// - Parameter defaultsKey: The key that’s used to store the Boolean flag for this condition with `UserDefaults`.
+		public init(defaultsKey: String) {
+			self.defaultsKey = defaultsKey
+		}
+		
+	}
+	
 	/// A condition that checks how much time has passed since the first launch.
 	@available(iOS 15, macOS 12, watchOS 8, tvOS 15, *) public struct TimeSinceFirstLaunch: RegistrableOnboardingCondition {
 		
